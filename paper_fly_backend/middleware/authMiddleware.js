@@ -37,3 +37,11 @@ export const admin = (req, res, next) => {
     res.status(403).json({ message: 'Not authorized as an admin' });
   }
 };
+
+export const userOnly = (req, res, next) => {
+  if (req.user && req.user.role === 'user') {
+    next();
+  } else {
+    res.status(403).json({ message: 'This operation is only allowed for regular users' });
+  }
+};
