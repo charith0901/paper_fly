@@ -1,4 +1,4 @@
-import axiosIns from '../utils/axiosIns';
+import axiosIns from '../../utils/axiosIns';
 
 export const getAllNewspapers = async () => {
   try {

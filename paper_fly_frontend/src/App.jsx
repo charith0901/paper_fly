@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from '../components/common/Navbar';
-import Login from '../components/auth/Login';
-import Register from '../components/auth/Register';
-import NewspaperList from '../components/newspaper/NewspaperList';
-import AddNewspaper from '../components/newspaper/AddNewspaper';
-import EditNewspaper from '../components/newspaper/EditNewspaper';
-import ProtectedRoute from '../components/common/ProtectedRoute';
+import Navbar from './components/common/Navbar';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import NewspaperList from './components/newspaper/NewspaperList';
+import AddNewspaper from './components/newspaper/AddNewspaper';
+import EditNewspaper from './components/newspaper/EditNewspaper';
+import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
   return (
@@ -32,6 +32,7 @@ function App() {
           
           {/* Redirect to newspapers list as home page */}
           <Route path="/" element={<Navigate to="/newspapers" replace />} />
+          <Route path="*" element={<div>Page not found</div>} />
         </Routes>
       </div>
     </BrowserRouter>
