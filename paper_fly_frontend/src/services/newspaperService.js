@@ -10,6 +10,17 @@ export const getAllNewspapers = async () => {
   }
 };
 
+export const getNewspaperById = async (id) => {
+  try {
+    const response = await axiosIns.get(`/api/newspapers/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching newspaper by ID:', error);
+    throw error;
+  }
+};
+
+
 export const addNewspaper = async (newspaperData) => {
   try {
     const response = await axiosIns.post('/api/newspapers', newspaperData);

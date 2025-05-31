@@ -6,6 +6,8 @@ import { initModels } from './models/index.js';
 import indexRoutes from './routes/index.js';
 import authRoutes from './routes/authRoutes.js';
 import newspaperRoutes from './routes/newspaperRoutes.js';
+import dailyRecieves from './routes/dailyRecieves.js';
+import billRoutes from './routes/billRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -28,6 +30,8 @@ const startServer = async () => {
     app.use('/api', indexRoutes);
     app.use('/api/auth', authRoutes);
     app.use('/api/newspapers', newspaperRoutes);
+    app.use('/api/dailyReceives', dailyRecieves);
+    app.use('/api/bills', billRoutes);
 
     // Default route
     app.get('/', (req, res) => {

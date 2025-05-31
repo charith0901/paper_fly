@@ -10,17 +10,43 @@ export const getAllNewspapers = async (req, res) => {
   }
 };
 
+export const getNewspaperByIdFunc = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const newspaper = await getNewspaperById(id);
+
+    if (!newspaper) {
+      return res.status(404).json({ message: "Newspaper not found" });
+    }
+
+    res.status(200).json(newspaper);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch newspaper by ID", error: error.message });
+  }
+}
+
+// Get a single newspaper by ID
+export const getNewspaperById = async (id) => {
+  try {
+    const newspaper = await NewsPaper.findByPk(id);
+    return newspaper;
+  } catch (error) {
+    console.error("Failed to fetch newspaper by ID:", error);
+    throw new Error("Failed to fetch newspaper by ID");
+  }
+}
+
 // Add a new newspaper
 export const addNewspaper = async (req, res) => {
   try {
     const { newspaper_name, type, price } = req.body;
-    
+
     const newNewspaper = await NewsPaper.create({
       newspaper_name,
       type,
       price
     });
-    
+
     res.status(201).json(newNewspaper);
   } catch (error) {
     res.status(400).json({ message: "Failed to add newspaper", error: error.message });
@@ -32,16 +58,16 @@ export const updateNewspaperPrice = async (req, res) => {
   try {
     const { id } = req.params;
     const { price } = req.body;
-    
+
     const newspaper = await NewsPaper.findByPk(id);
-    
+
     if (!newspaper) {
       return res.status(404).json({ message: "Newspaper not found" });
     }
-    
+
     newspaper.price = price;
     await newspaper.save();
-    
+
     res.status(200).json(newspaper);
   } catch (error) {
     res.status(400).json({ message: "Failed to update newspaper price", error: error.message });
@@ -52,15 +78,15 @@ export const updateNewspaperPrice = async (req, res) => {
 export const deleteNewspaper = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const newspaper = await NewsPaper.findByPk(id);
-    
+
     if (!newspaper) {
       return res.status(404).json({ message: "Newspaper not found" });
     }
-    
+
     await newspaper.destroy();
-    
+
     res.status(200).json({ message: "Newspaper deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Failed to delete newspaper", error: error.message });

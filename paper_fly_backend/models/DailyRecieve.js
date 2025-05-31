@@ -6,20 +6,24 @@ const DailyRecieve = sequelize.define(
   "daily_recieve",
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
       primaryKey: true,
-      autoIncrement: true,
     },
     date: {
       type: DataTypes.DATE,
       allowNull: false,
     },
-    newspaperCopies: {
-      type: DataTypes.JSON,
-      allowNull: false,
-      comment:
-        "JSON array of objects with newspaper_id and quantity fields. Example: [{newspaper_id: 1, quantity: 10}, {newspaper_id: 2, quantity: 5}]",
-    }
+    bill_id: {
+      type: DataTypes.UUID, // Changed from INTEGER to UUID
+      allowNull: true,
+      comment: "Foreign key to the Bill table",
+      references: {
+        model: "bills",
+        key: "id", // Explicitly specify the referenced key
+      },
+    },
   },
   {
     timestamps: true,
@@ -28,13 +32,13 @@ const DailyRecieve = sequelize.define(
   }
 );
 
-DailyRecieve.prototype.getNewspapers = async function() {
-        const newspaperIds = this.newspaperCopies.map(item => item.newspaper_id);
-        return await NewsPaper.findAll({
-            where: {
-                id: newspaperIds
-            }
-        });
-    };
+DailyRecieve.prototype.getNewspapers = async function () {
+  const newspaperIds = this.newspaperCopies.map((item) => item.newspaper_id);
+  return await NewsPaper.findAll({
+    where: {
+      id: newspaperIds,
+    },
+  });
+};
 
 export default DailyRecieve;

@@ -1,39 +1,57 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getCurrentUser, logout } from '../../services/authService';
+import { Menu, Dropdown, Button } from 'antd';
+import { UserOutlined, LogoutOutlined, LoginOutlined, UserAddOutlined, HomeOutlined, ReadOutlined } from '@ant-design/icons';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const user = getCurrentUser();
-  
+
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
-  
+
+  const userMenu = (
+    <Menu>
+      <Menu.Item key="username" icon={<UserOutlined />}>
+        Hello, {user?.username}
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+        Logout
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
-    <nav className="bg-blue-600 text-white p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold">PaperFly</Link>
-        
-        <div className="flex space-x-4">
-          <Link to="/" className="hover:text-blue-200">Home</Link>
-          <Link to="/newspapers" className="hover:text-blue-200">Newspapers</Link>
-          
+    <nav style={{ background: '#1677ff', padding: '0 24px' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 64 }}>
+        <Link to="/" style={{ color: '#fff', fontSize: 24, fontWeight: 'bold', textDecoration: 'none' }}>
+          PaperFly
+        </Link>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+          <Link to="/" style={{ color: '#fff' }}>
+            <HomeOutlined /> Home
+          </Link>
+          <Link to="/newspapers" style={{ color: '#fff' }}>
+            <ReadOutlined /> Newspapers
+          </Link>
           {user ? (
-            <>
-              <span className="hover:text-blue-200">Hello, {user.username}</span>
-              <button 
-                onClick={handleLogout}
-                className="hover:text-blue-200"
-              >
-                Logout
-              </button>
-            </>
+            <Dropdown overlay={userMenu} placement="bottomRight" trigger={['click']}>
+              <Button type="link" style={{ color: '#fff' }} icon={<UserOutlined />}>
+                {user.username}
+              </Button>
+            </Dropdown>
           ) : (
             <>
-              <Link to="/login" className="hover:text-blue-200">Login</Link>
-              <Link to="/register" className="hover:text-blue-200">Register</Link>
+              <Link to="/login" style={{ color: '#fff' }}>
+                <LoginOutlined /> Login
+              </Link>
+              <Link to="/register" style={{ color: '#fff' }}>
+                <UserAddOutlined /> Register
+              </Link>
             </>
           )}
         </div>

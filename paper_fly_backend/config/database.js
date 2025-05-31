@@ -3,31 +3,63 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Database path
-const dataDir = path.join(__dirname, '..', 'data');
-const dbPath = path.join(dataDir, 'database.sqlite');
+dotenv.config();
 
-// Ensure data directory exists
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
+// Database configuration
+const DB_NAME = process.env.DB_NAME || 'paper_fly';
+const DB_USER = process.env.DB_USER || 'root';
+const DB_PASSWORD = process.env.DB_PASSWORD || '1234';
+const DB_HOST = process.env.DB_HOST || 'localhost';
+const DB_PORT = process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 3306;
 
-// Initialize Sequelize with SQLite
+// Create database if it doesn't exist
+const createDbIfNotExists = async () => {
+  // First connect without specifying database to create it if needed
+  const tempSequelize = new Sequelize({
+    dialect: 'mysql',
+    host: DB_HOST,
+    port: DB_PORT,
+    username: DB_USER,
+    password: DB_PASSWORD,
+    logging: false,
+  });
+
+  try {
+    await tempSequelize.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;`);
+    console.log(`Ensured database '${DB_NAME}' exists.`);
+  } catch (error) {
+    console.error('Error creating database:', error);
+    throw error;
+  } finally {
+    await tempSequelize.close();
+  }
+};
+
+// Initialize Sequelize with MySQL
 const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: dbPath,
+  dialect: 'mysql',
+  host: DB_HOST,
+  port: DB_PORT,
+  username: DB_USER,
+  password: DB_PASSWORD,
+  database: DB_NAME,
   logging: console.log,
 });
 
 // Test the connection
 const initDatabase = async () => {
   try {
+    // Ensure database exists
+    await createDbIfNotExists();
+    
+    // Connect to database
     await sequelize.authenticate();
-    console.log('SQLite database connection established successfully.');
+    console.log('MySQL database connection established successfully.');
     
     // Sync all models with database
     await sequelize.sync({ alter: true });

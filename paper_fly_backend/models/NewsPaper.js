@@ -5,8 +5,9 @@ const NewsPaper = sequelize.define(
   "newspaper",
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
       primaryKey: true,
     },
     newspaper_name: {

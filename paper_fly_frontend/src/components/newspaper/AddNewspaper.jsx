@@ -1,37 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addNewspaper } from '../../services/newspaperService';
+import { Form, Input, Button, Select, Card, Typography, InputNumber, Alert, Space } from 'antd';
+import { SaveOutlined, RollbackOutlined } from '@ant-design/icons';
+
+const { Title } = Typography;
+const { Option } = Select;
 
 const AddNewspaper = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    newspaper_name: '',
-    type: 'daily',
-    price: ''
-  });
+  const [form] = Form.useForm();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: name === 'price' ? (value === '' ? '' : parseInt(value)) : value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Simple validation
-    if (!formData.newspaper_name || !formData.type || formData.price === '') {
-      setError('All fields are required');
-      return;
-    }
-
+  const handleSubmit = async (values) => {
     try {
       setLoading(true);
-      await addNewspaper(formData);
+      await addNewspaper({
+        newspaper_name: values.newspaper_name,
+        type: values.type,
+        price: values.price
+      });
       navigate('/newspapers');
     } catch (err) {
       setError('Failed to add newspaper');
@@ -41,67 +30,72 @@ const AddNewspaper = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-md">
-      <h1 className="text-2xl font-bold mb-6">Add New Newspaper</h1>
-      
-      {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
-      
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-2 font-medium">Newspaper Name</label>
-          <input
-            type="text"
+    <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
+      <Card>
+        <Title level={2}>Add New Newspaper</Title>
+        
+        {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
+        
+        <Form 
+          form={form}
+          layout="vertical" 
+          onFinish={handleSubmit}
+          initialValues={{ type: 'daily' }}
+        >
+          <Form.Item
             name="newspaper_name"
-            value={formData.newspaper_name}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-        
-        <div className="mb-4">
-          <label className="block mb-2 font-medium">Type</label>
-          <select
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
+            label="Newspaper Name"
+            rules={[{ required: true, message: 'Please input newspaper name!' }]}
           >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-          </select>
-        </div>
-        
-        <div className="mb-4">
-          <label className="block mb-2 font-medium">Price</label>
-          <input
-            type="number"
-            name="price"
-            value={formData.price}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-            min="0"
-          />
-        </div>
-        
-        <div className="flex gap-3">
-          <button
-            type="submit"
-            disabled={loading}
-            className={`bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            {loading ? 'Adding...' : 'Add Newspaper'}
-          </button>
+            <Input />
+          </Form.Item>
           
-          <button
-            type="button"
-            onClick={() => navigate('/newspapers')}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+          <Form.Item
+            name="type"
+            label="Type"
+            rules={[{ required: true, message: 'Please select newspaper type!' }]}
           >
-            Cancel
-          </button>
-        </div>
-      </form>
+            <Select>
+              <Option value="daily">Daily</Option>
+              <Option value="weekly">Weekly</Option>
+              <Option value="monthly">Monthly</Option>
+            </Select>
+          </Form.Item>
+          
+          <Form.Item
+            name="price"
+            label="Price"
+            rules={[{ required: true, message: 'Please input the price!' }]}
+          >
+            <InputNumber 
+              min={0}
+              formatter={value => `$ ${value}`}
+              parser={value => value.replace(/\$\s?|(,*)/g, '')}
+              style={{ width: '100%' }}
+            />
+          </Form.Item>
+          
+          <Form.Item>
+            <Space>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                loading={loading}
+                icon={<SaveOutlined />}
+              >
+                Add Newspaper
+              </Button>
+              
+              <Button 
+                onClick={() => navigate('/newspapers')}
+                icon={<RollbackOutlined />}
+              >
+                Cancel
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Card>
     </div>
   );
 };

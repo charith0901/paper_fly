@@ -1,88 +1,99 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { getAllDailyRecieves, deleteDailyRecieve } from '../../../src/services/dailyRecieveService';
-import { format } from 'date-fns';
+import { Link, useParams } from 'react-router-dom';
+import { Table, Button, Space, Typography, message, Popconfirm, Spin, Alert } from 'antd';
+import { PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { getAllDailyReceivesByBillId, deleteDailyReceive } from '../../services/dailyReceiveService';
+
+const { Title } = Typography;
 
 const DailyReceiveList = () => {
-  const [dailyReceipts, setDailyReceipts] = useState([]);
+  const [dailyreceives, setDailyreceives] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const bill_id = useParams().id;
 
   useEffect(() => {
-    const fetchDailyReceipts = async () => {
+    const fetchDailyreceives = async () => {
       try {
-        const data = await getAllDailyRecieves();
-        setDailyReceipts(data);
+        const data = await getAllDailyReceivesByBillId(bill_id);
+        setDailyreceives(data);
         setLoading(false);
       } catch (err) {
-        setError('Failed to fetch daily receipts');
+        setError('Failed to fetch daily receives');
         setLoading(false);
       }
     };
 
-    fetchDailyReceipts();
-  }, []);
+    fetchDailyreceives();
+  }, [bill_id]);
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this record?')) {
-      try {
-        await deleteDailyRecieve(id);
-        setDailyReceipts(dailyReceipts.filter(receipt => receipt.id !== id));
-      } catch (err) {
-        setError('Failed to delete the record');
-      }
+    try {
+      await deleteDailyReceive(id);
+      setDailyreceives(dailyreceives.filter(Receive => Receive.id !== id));
+      message.success('Record deleted successfully');
+    } catch (err) {
+      setError('Failed to delete the record');
+      message.error('Failed to delete the record');
     }
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
-  if (error) return <div className="error">{error}</div>;
+  const columns = [
+    {
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'date',
+      render: (date) => new Date(date).toLocaleDateString(),
+    },
+    {
+      title: 'Newspaper Copies',
+      key: 'length',
+      render: (_, record) => `${record.newspapers.length} different newspapers`,
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record) => (
+        <Space>
+          <Link to={`/receive/${record.id}`}>
+            <Button icon={<EyeOutlined />} size="small" />
+          </Link>
+          <Link to={`/receive/edit/${record.id}`}>
+            <Button icon={<EditOutlined />} size="small" />
+          </Link>
+          <Popconfirm
+            title="Are you sure you want to delete this record?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button icon={<DeleteOutlined />} danger size="small" />
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+  if (loading) return <div className="flex justify-center items-center h-64 text-lg"><Spin size="large" /></div>;
+  if (error) return <Alert message={error} type="error" showIcon />;
 
   return (
-    <div className="daily-receipts-container">
-      <h1>Daily Newspaper Receipts</h1>
-      <Link to="/daily-receipts/new" className="btn btn-primary mb-3">
-        Add New Receipt
-      </Link>
-      
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Date</th>
-            <th>Newspaper Copies</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dailyReceipts.map((receipt) => (
-            <tr key={receipt.id}>
-              <td>{receipt.id}</td>
-              <td>{format(new Date(receipt.date), 'yyyy-MM-dd')}</td>
-              <td>{receipt.newspaperCopies.length} different newspapers</td>
-              <td>
-                <Link 
-                  to={`/daily-receipts/${receipt.id}`} 
-                  className="btn btn-info btn-sm me-2"
-                >
-                  View
-                </Link>
-                <Link 
-                  to={`/daily-receipts/edit/${receipt.id}`} 
-                  className="btn btn-warning btn-sm me-2"
-                >
-                  Edit
-                </Link>
-                <button 
-                  onClick={() => handleDelete(receipt.id)} 
-                  className="btn btn-danger btn-sm"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="container mx-auto p-6">
+      <div className="flex justify-between items-center mb-6">
+        <Title level={2} style={{ margin: 0 }}>Daily Newspaper Receives Of Week</Title>
+        <Link to="/billing/new">
+          <Button type="primary" icon={<PlusOutlined />}>
+            Add New Receive
+          </Button>
+        </Link>
+      </div>
+      <Table
+        columns={columns}
+        dataSource={dailyreceives}
+        rowKey="id"
+        pagination={false}
+        bordered
+      />
     </div>
   );
 };

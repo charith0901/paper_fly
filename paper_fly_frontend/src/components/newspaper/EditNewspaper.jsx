@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getAllNewspapers, updateNewspaperPrice } from '../../services/newspaperService';
+import { getNewspaperById, updateNewspaperPrice } from '../../services/newspaperService';
+import { Form, Input, Button, Card, Typography, Space, Spin, Alert, InputNumber } from 'antd';
+import { SaveOutlined, RollbackOutlined } from '@ant-design/icons';
+
+const { Title, Text } = Typography;
 
 const EditNewspaper = () => {
   const { id } = useParams();
@@ -15,12 +19,11 @@ const EditNewspaper = () => {
   useEffect(() => {
     const fetchNewspaper = async () => {
       try {
-        const newspapers = await getAllNewspapers();
-        const found = newspapers.find(n => n.id === parseInt(id));
+        const newspaper = await getNewspaperById(id);
         
-        if (found) {
-          setNewspaper(found);
-          setPrice(found.price);
+        if (newspaper) {
+          setNewspaper(newspaper);
+          setPrice(newspaper.price);
         } else {
           setError('Newspaper not found');
         }
@@ -34,9 +37,7 @@ const EditNewspaper = () => {
     fetchNewspaper();
   }, [id]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (price === '') {
       setError('Price is required');
       return;
@@ -53,55 +54,62 @@ const EditNewspaper = () => {
     }
   };
 
-  if (loading) return <div className="text-center p-5">Loading...</div>;
-  if (error && !newspaper) return <div className="text-center p-5 text-red-500">{error}</div>;
+  if (loading) return <div style={{ textAlign: 'center', padding: 24 }}><Spin size="large" /></div>;
+  if (error && !newspaper) return <Alert message={error} type="error" showIcon />;
 
   return (
-    <div className="container mx-auto p-4 max-w-md">
-      <h1 className="text-2xl font-bold mb-6">Edit Newspaper Price</h1>
-      
-      {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
-      
-      {newspaper && (
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <p className="font-medium">Newspaper Name: <span className="font-normal">{newspaper.newspaper_name}</span></p>
-          </div>
-          
-          <div className="mb-4">
-            <p className="font-medium">Type: <span className="font-normal">{newspaper.type}</span></p>
-          </div>
-          
-          <div className="mb-4">
-            <label className="block mb-2 font-medium">Price</label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="w-full p-2 border rounded"
-              min="0"
-            />
-          </div>
-          
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              disabled={saving}
-              className={`bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              {saving ? 'Saving...' : 'Update Price'}
-            </button>
+    <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
+      <Card>
+        <Title level={2}>Edit Newspaper Price</Title>
+        
+        {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
+        
+        {newspaper && (
+          <Form layout="vertical" onFinish={handleSubmit}>
+            <Form.Item label="Newspaper Name">
+              <Text>{newspaper.newspaper_name}</Text>
+            </Form.Item>
             
-            <button
-              type="button"
-              onClick={() => navigate('/newspapers')}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+            <Form.Item label="Type">
+              <Text>{newspaper.type}</Text>
+            </Form.Item>
+            
+            <Form.Item 
+              label="Price" 
+              rules={[{ required: true, message: 'Please input the price!' }]}
             >
-              Cancel
-            </button>
-          </div>
-        </form>
-      )}
+              <InputNumber
+                value={price}
+                onChange={setPrice}
+                min={0}
+                formatter={value => `$ ${value}`}
+                parser={value => value.replace(/\$\s?|(,*)/g, '')}
+                style={{ width: '100%' }}
+              />
+            </Form.Item>
+            
+            <Form.Item>
+              <Space>
+                <Button 
+                  type="primary" 
+                  htmlType="submit" 
+                  loading={saving}
+                  icon={<SaveOutlined />}
+                >
+                  Update Price
+                </Button>
+                
+                <Button 
+                  onClick={() => navigate('/newspapers')}
+                  icon={<RollbackOutlined />}
+                >
+                  Cancel
+                </Button>
+              </Space>
+            </Form.Item>
+          </Form>
+        )}
+      </Card>
     </div>
   );
 };

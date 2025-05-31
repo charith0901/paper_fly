@@ -2,6 +2,7 @@ import User from './User.js';
 import NewsPaper from './NewsPaper.js';
 import Bill from './Bill.js';
 import DailyRecieve from './DailyRecieve.js';
+import Stock from './Stock.js';
 
 // Export all models
 export {
@@ -9,6 +10,7 @@ export {
     NewsPaper,
     Bill,
     DailyRecieve,
+    Stock
 };
 
 // Export a function to initialize all models
