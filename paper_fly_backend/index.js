@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import serverless from 'serverless-http';
 import { getDatabase } from './config/database.js';
 import { initModels } from './models/index.js';
 import indexRoutes from './routes/index.js';
@@ -13,39 +14,37 @@ import billRoutes from './routes/billRoutes.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-// Initialize database and models
-const startServer = async () => {
-  try {
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use('/api', indexRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/newspapers', newspaperRoutes);
+app.use('/api/dailyReceives', dailyRecieves);
+app.use('/api/bills', billRoutes);
+
+// Default route
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to Paper Fly API with Sequelize support' });
+});
+
+// Initialize database and models before exporting handler
+let isInitialized = false;
+const initialize = async () => {
+  if (!isInitialized) {
     await getDatabase();
     await initModels();
-
-    // Middleware
-    app.use(cors());
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
-
-    // Routes
-    app.use('/api', indexRoutes);
-    app.use('/api/auth', authRoutes);
-    app.use('/api/newspapers', newspaperRoutes);
-    app.use('/api/dailyReceives', dailyRecieves);
-    app.use('/api/bills', billRoutes);
-
-    // Default route
-    app.get('/', (req, res) => {
-      res.json({ message: 'Welcome to Paper Fly API with Sequelize support' });
-    });
-
-    // Start server
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+    isInitialized = true;
   }
 };
 
-startServer();
+const handler = async (event, context) => {
+  await initialize();
+  return serverless(app)(event, context);
+};
+
+export default handler;
