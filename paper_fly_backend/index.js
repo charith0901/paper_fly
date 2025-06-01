@@ -8,41 +8,44 @@ import authRoutes from './routes/authRoutes.js';
 import newspaperRoutes from './routes/newspaperRoutes.js';
 import dailyRecieves from './routes/dailyRecieves.js';
 import billRoutes from './routes/billRoutes.js';
-import serverless from 'serverless-http';
+
+// Load environment variables
 dotenv.config();
 
 const app = express();
-let isInitialized = false;
+const PORT = process.env.PORT || 5000;
 
-const initializeApp = async () => {
-  if (!isInitialized) {
+// Initialize database and models
+const startServer = async () => {
+  try {
     await getDatabase();
     await initModels();
-    isInitialized = true;
+
+    // Middleware
+    app.use(cors());
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+
+    // Routes
+    app.use('/api', indexRoutes);
+    app.use('/api/auth', authRoutes);
+    app.use('/api/newspapers', newspaperRoutes);
+    app.use('/api/dailyReceives', dailyRecieves);
+    app.use('/api/bills', billRoutes);
+
+    // Default route
+    app.get('/', (req, res) => {
+      res.json({ message: 'Welcome to Paper Fly API with Sequelize support' });
+    });
+
+    // Start server
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
   }
 };
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Routes
-app.use('/api', indexRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/newspapers', newspaperRoutes);
-app.use('/api/dailyReceives', dailyRecieves);
-app.use('/api/bills', billRoutes);
-
-// Default route
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Paper Fly API with Sequelize support' });
-});
-
-// Wrap in serverless function
-const handler = async (req, res) => {
-  await initializeApp();
-  return serverless(app)(req, res);
-};
-
-export { handler };
+startServer();
