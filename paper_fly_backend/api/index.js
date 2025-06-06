@@ -49,7 +49,7 @@ const initialize = async () => {
 
 
 const handler = async (event, context) => {
-  await initialize();
+  //await initialize();
   return serverless(app)(event, context);
 };
 
