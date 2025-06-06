@@ -1,8 +1,6 @@
 import { Sequelize } from 'sequelize';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import fs from 'fs';
-import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -26,7 +24,7 @@ const createDbIfNotExists = async () => {
     port: DB_PORT,
     username: DB_USER,
     password: DB_PASSWORD,
-    logging: false,
+    logging: true,
   });
 
   try {
@@ -55,7 +53,7 @@ const sequelize = new Sequelize({
 const initDatabase = async () => {
   try {
     // Ensure database exists
-    await createDbIfNotExists();
+    //await createDbIfNotExists();
     
     // Connect to database
     await sequelize.authenticate();
@@ -71,7 +69,7 @@ const initDatabase = async () => {
     return sequelize;
   } catch (error) {
     console.error('Unable to connect to the database:', error);
-    process.exit(1);
+    throw error;
   }
 };
 
@@ -95,11 +93,6 @@ const initializeAdminUser = async () => {
         password: '1234',
         role: 'admin'
       });
-      
-      console.log('Temporary admin user created:');
-      console.log('Email: admin@paperfly.com');
-      console.log('Password: admin123');
-      console.log('IMPORTANT: Change these credentials in production!');
     }
   } catch (error) {
     console.error('Error initializing admin user:', error);
