@@ -1,5 +1,4 @@
-import React from 'react';
-export const Footer = () => {
+const Footer = () => {
   return <footer className="bg-slate-900 border-t border-purple-500/20 py-8">
       <div className="container mx-auto px-4">
         <div className="text-center">
@@ -17,3 +16,5 @@ export const Footer = () => {
       </div>
     </footer>;
 };
+
+export default Footer;
