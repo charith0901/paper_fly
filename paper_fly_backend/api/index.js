@@ -36,11 +36,17 @@ app.get('/', (req, res) => {
 let isInitialized = false;
 const initialize = async () => {
   if (!isInitialized) {
-    await getDatabase();
-    await initModels();
-    isInitialized = true;
+    try {
+      await getDatabase();
+      await initModels();
+      isInitialized = true;
+    } catch (err) {
+      console.error('DB Init Error:', err);
+      throw err;
+    }
   }
 };
+
 
 const handler = async (event, context) => {
   await initialize();
