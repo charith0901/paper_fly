@@ -2,6 +2,7 @@ import { Sequelize } from 'sequelize';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import mysql2 from 'mysql2/promise';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,14 +41,14 @@ const createDbIfNotExists = async () => {
 
 // Initialize Sequelize with MySQL
 const sequelize = new Sequelize({
-  dialect: 'mysql2',
+  dialect: 'mysql',
   host: DB_HOST,
   port: DB_PORT,
   username: DB_USER,
   password: DB_PASSWORD,
   database: DB_NAME,
   logging: console.log,
-  dialectModule: import('mysql2'),
+  dialectModule: mysql2,
 });
 
 // Test the connection
