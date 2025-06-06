@@ -25,6 +25,7 @@ const createDbIfNotExists = async () => {
     username: DB_USER,
     password: DB_PASSWORD,
     logging: true,
+    dialectModule: require('mysql2'),
   });
 
   try {
