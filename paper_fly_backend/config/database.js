@@ -47,6 +47,12 @@ const sequelize = new Sequelize({
   password: DB_PASSWORD,
   database: DB_NAME,
   logging: console.log,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false 
+    }
+  }
 });
 
 // Test the connection
