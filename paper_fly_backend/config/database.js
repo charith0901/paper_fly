@@ -40,7 +40,7 @@ const createDbIfNotExists = async () => {
 
 // Initialize Sequelize with MySQL
 const sequelize = new Sequelize({
-  dialect: 'mysql',
+  dialect: 'mysql2',
   host: DB_HOST,
   port: DB_PORT,
   username: DB_USER,
