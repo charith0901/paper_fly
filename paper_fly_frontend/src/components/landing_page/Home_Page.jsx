@@ -2,6 +2,7 @@ import Header from './Header';
 import Hero from './Hero';
 import FoodMenu from './FoodMenu';
 import ContactInfo from './ContactInfo';
+import Footer from './Footer';
 
 const HomePage = () => {
     return (
@@ -12,8 +13,9 @@ const HomePage = () => {
                 <Hero />
                 <FoodMenu />
                 <ContactInfo />
-      </main>
-    </div>
+            </main>
+            <Footer />
+        </div>
     );
 }
 

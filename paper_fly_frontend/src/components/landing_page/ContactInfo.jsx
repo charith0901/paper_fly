@@ -17,11 +17,11 @@ const ContactInfo = () => {
               {[{
               icon: MapPinIcon,
               title: 'Location',
-              content: 'Koralaima, Sri Lanka'
+              content: 'Koralaima, Gonapola, Sri Lanka'
             }, {
               icon: PhoneIcon,
               title: 'Phone',
-              content: '+94 123 456 789'
+              content: '076 476 6975'
             }, {
               icon: ClockIcon,
               title: 'Hours',
@@ -43,7 +43,7 @@ const ContactInfo = () => {
                   <h4 className="font-bold text-gray-200 text-lg">
                     Ajith Hotel
                   </h4>
-                  <p className="text-gray-300">Koralaima, Sri Lanka</p>
+                  <p className="text-gray-300">Koralaima, Gonapola, Sri Lanka</p>
                   <p className="mt-2 text-sm text-gray-400">
                     Interactive map available when visiting our website
                   </p>
