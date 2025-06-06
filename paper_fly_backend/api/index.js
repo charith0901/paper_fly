@@ -2,13 +2,13 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import serverless from 'serverless-http';
-import { getDatabase } from './config/database.js';
-import { initModels } from './models/index.js';
-import indexRoutes from './routes/index.js';
-import authRoutes from './routes/authRoutes.js';
-import newspaperRoutes from './routes/newspaperRoutes.js';
-import dailyRecieves from './routes/dailyRecieves.js';
-import billRoutes from './routes/billRoutes.js';
+import { getDatabase } from '../config/database.js';
+import { initModels } from '../models/index.js';
+import indexRoutes from '../routes/index.js';
+import authRoutes from '../routes/authRoutes.js';
+import newspaperRoutes from '../routes/newspaperRoutes.js';
+import dailyRecieves from '../routes/dailyRecieves.js';
+import billRoutes from '../routes/billRoutes.js';
 
 // Load environment variables
 dotenv.config();
