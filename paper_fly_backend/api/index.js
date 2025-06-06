@@ -1,7 +1,7 @@
+// api/index.js
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import serverless from 'serverless-http';
 import { getDatabase } from '../config/database.js';
 import { initModels } from '../models/index.js';
 import indexRoutes from '../routes/index.js';
@@ -10,7 +10,6 @@ import newspaperRoutes from '../routes/newspaperRoutes.js';
 import dailyRecieves from '../routes/dailyRecieves.js';
 import billRoutes from '../routes/billRoutes.js';
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
@@ -32,25 +31,20 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Paper Fly API with Sequelize support' });
 });
 
-// Initialize database and models before exporting handler
-let isInitialized = false;
-const initialize = async () => {
-  if (!isInitialized) {
-    try {
-      await getDatabase();
-      await initModels();
-      isInitialized = true;
-    } catch (err) {
-      console.error('DB Init Error:', err);
-      throw err;
-    }
+const PORT = process.env.PORT || 3000;
+
+// Start server after DB is ready
+const startServer = async () => {
+  try {
+    await getDatabase();
+    await initModels();
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('❌ DB Init Error:', err);
   }
 };
 
-
-const handler = async (event, context) => {
-  //await initialize();
-  return serverless(app)(event, context);
-};
-
-export default handler;
+startServer();
