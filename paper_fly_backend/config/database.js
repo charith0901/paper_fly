@@ -25,7 +25,6 @@ const createDbIfNotExists = async () => {
     username: DB_USER,
     password: DB_PASSWORD,
     logging: true,
-    dialectModule: require('mysql2'),
   });
 
   try {
@@ -48,6 +47,7 @@ const sequelize = new Sequelize({
   password: DB_PASSWORD,
   database: DB_NAME,
   logging: console.log,
+  dialectModule: import('mysql2'),
 });
 
 // Test the connection
